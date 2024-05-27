@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Games{% endblock %}
+
+{% block styles %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body, html {
+        height: 100%;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+        background: linear-gradient(145deg, #6d5dfc, #b28dff);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #ffffff;
+        flex-direction: column;
+    }
+    h1 {
+        margin: 20px 0;
+        color: #ffffff;
+    }
+    .game-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+    .game {
+        width: calc(33.33% - 30px); /* Adjusted width for 6 options */
+        height: 200px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        margin: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        background-color: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(8px);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .game:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+    .game img {
+        max-width: 80%;
+        max-height: 80%;
+    }
+    .game-text {
+        position: absolute;
+        bottom: 5px;
+        width: 100%;
+        text-align: center;
+        font-size: 14px;
+        color: #f0f0f0;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    }
+    iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: none; /* Initially hidden */
+        position: fixed;
+        top: 0;
+        left: 0;
+    }
+
+    /* Close button styles */
+    .close-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 24px;
+        color: #ffffff;
+        cursor: pointer;
+    }
+
+    .close-button:hover {
+        color: #cccccc;
+    }
+</style>
+</head>
+<body>
+<h1 id="page-title">Choose a Game to Play!</h1>
+<a id="stop-button" href="{% url 'chatbot' %}">Go back</a>
+<div class="game-container">
+    <!-- Game tiles go here -->
+    <div class="game" onclick="loadGame('Flappy Bird', '{% static '/games/Flappy-Bird/index.html' %}')">
+        <img src="{% static 'games/Flappy-Bird/images/Bird.png' %}" alt="Flappy Bird">
+        <div class="game-text">Flappy Bird</div>
+    </div>
+    <div class="game" onclick="loadGame('Candy Crush', '{% static '/games/candy-crush/index.html' %}')">
+        <img src="{% static 'games/candy-crush/images/candy.png' %}" alt="Candy Crush">
+        <div class="game-text">Candy Crush</div>
+    </div>
+    <div class="game" onclick="loadGame('Doodle jump', '{% static '/games/doodle-jump/index.html' %}')">
+        <img src="{% static 'games/doodle-jump/doodler-right.png' %}" alt="Doodle jump">
+        <div class="game-text">Doodle jump</div>
+    </div>
+    <div class="game" onclick="loadGame('Break out', '{% static '/games/breakout/index.html' %}')">
+        <img src="{% static 'games/breakout/break.png' %}" alt="Break out">
+        <div class="game-text">Break out</div>
+    </div>
+    <div class="game" onclick="loadGame('Black Jack', '{% static '/games/black-jack/index.html' %}')">
+        <img src="{% static 'games/black-jack/jack.jpg' %}" alt="Black jack">
+        <div class="game-text">Black Jack</div>
+    </div>
+    <div class="game" onclick="loadGame('Whac mole', '{% static '/games/whac-a-mole/index.html' %}')">
+        <img src="{% static 'games/whac-a-mole/piranha-plant.png' %}" alt="Whac mole">
+        <div class="game-text">Whac mole</div>
+    </div>
+</div>
+<iframe id="gameFrame"></iframe>
+
+<script>
+function loadGame(gameTitle, url) {
+    var iframe = document.getElementById('gameFrame');
+    var pageTitle = document.getElementById('page-title');
+    pageTitle.textContent = gameTitle; // Update the title
+    iframe.src = url;
+    iframe.style.display = 'block'; // Show the iframe
+    document.querySelector('.game-container').style.display = 'none'; // Hide the games
+
+    // Show close button
+    var closeButton = document.createElement('span');
+    closeButton.innerHTML = '&times;';
+    closeButton.className = 'close-button';
+    closeButton.onclick = function() {
+        history.back(); // Go back to previous page
+    };
+    document.body.appendChild(closeButton);
+
+    // Use the History API to handle navigation
+    history.pushState({ page: 'game' }, gameTitle, '#game');
+}
+
+// Listen for popstate event to handle the browser's back button
+window.onpopstate = function(event) {
+    if (event.state && event.state.page === 'game') {
+        // The game is already being displayed, no need to do anything here
+    } else {
+        // Show the game selection screen
+        document.getElementById('gameFrame').style.display = 'none';
+        document.querySelector('.game-container').style.display = 'flex';
+        document.getElementById('page-title').textContent = 'Choose a Game to Play!';
+
+        // Remove close button
+        var closeButton = document.querySelector('.close-button');
+        if (closeButton) {
+            closeButton.parentNode.removeChild(closeButton);
+        }
+    }
+};
+</script>
+{% endblock %}

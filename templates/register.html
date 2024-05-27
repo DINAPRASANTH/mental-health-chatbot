@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register{% endblock %}
+{% block styles %}
+<style>
+	#button-border{
+    background-color: #ffffff;
+    border: 2px solid #d45050;
+    color: #d45050;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+	transition: all .3s ease-in-out;
+  }
+  
+#button-border:hover{
+	border: 2px solid #d45050;
+    background-color: #d45050;
+    color: white;
+  }
+
+
+#button-border:active{
+	border: 2px solid #d45050;
+    background-color: #d45050;
+    color: white;
+    transform: scaleX(0.3);
+  }
+</style>
+
+{% endblock %}
+
+{% block content %}
+	<div class="wrapper">
+		<div class="inner">
+			<img src="{% static 'images/image-1.png' %}" alt="" class="image-1">
+			{% if error_message %}
+			<div class="alert alert-danger" role="alert">{{ error_message }}</div>
+			{% endif %}
+			<form id="login-form" method="post">
+				{% csrf_token %}
+				<h3>New Account?</h3>
+				<div class="form-holder">
+					<span class="lnr lnr-user"></span>
+					<input type="text" class="form-control" placeholder="Username" id="username" name="username" required>
+				</div>
+				<div class="form-holder">
+					<span class="lnr lnr-envelope"></span>
+					<input type="text" class="form-control" placeholder="Mail" id="email" name="email" required>
+				</div>
+				<div class="form-holder">
+					<span class="lnr lnr-lock"></span>
+					<input type="password" class="form-control" placeholder="Password" id="password1" name="password1" required>
+				</div>
+				<div class="form-holder">
+					<span class="lnr lnr-lock"></span>
+					<input type="password" class="form-control" placeholder="Confirm Password" id="password2" name="password2" required>
+				</div>
+				<button id="button-border">
+					<span>Register</span>
+				</button>
+				<h5 class="mt-5">Already have an account?</h5>
+			<a style="color: #d45050;" href="{% url 'login' %}">click here to login</a>
+			</form>
+			<img src="{% static 'images/image-2.png' %}" alt="" class="image-2">
+		</div>
+	</div>
+{% endblock %}

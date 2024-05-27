@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}preferences{% endblock %}
+{% block content %}
+<h2>Enter Your Information:</h2>
+<form action="{% url 'prefer' %}" method="post">
+    {% csrf_token %}
+    <label for="fav_food">Favorite Food:</label><br>
+    <input type="text" id="fav_food" name="fav_food"><br>
+    <label for="gender">Gender:</label><br>
+    <input type="radio" id="male" name="gender" value="male">
+    <label for="male">Male</label><br>
+    <input type="radio" id="female" name="gender" value="female">
+    <label for="female">Female</label><br>
+    <input type="radio" id="other" name="gender" value="other">
+    <label for="other">Other</label><br>
+    <label for="fav_color">Favorite Color:</label><br>
+    <input type="color" id="fav_color" name="fav_color" value="#00000"><br>
+    <input type="submit" value="Submit">
+</form>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+{% block styles %}
+<style>
+    #videoElement{
+        margin-left: 6rem;
+        margin-top: 4rem;
+        border: 2px solid pink;
+        box-shadow: 2px 2px 10px grey;
+    }
+    </style>
+{% endblock %}
+
+<body>
+
+    <div style="display: flex; justify-content: space-between;">
+        <video id="videoElement" width="600" height="450" autoplay muted style="display:none;"></video>
+        <div id='forgif' style="background-color:white;">
+            <div id='mygif1' style="display:none;">
+                <img src='{% static 'images/mygif1.gif' %}' alt='mygif1'>
+            </div>
+            <div id='mygif2' style="display:none;">
+                <img src='{% static 'images/mygif2.gif' %}' alt='mygif2'>
+            </div>
+        </div>
+    </div>
+    
+    <button id="stop-button">Stop Camera</button>
+    <a id="stop-button" href="{% url 'chatbot' %}">Go back</a>
+    <form id="audio-form" method="post" onsubmit="showRecognizing()">
+        {% csrf_token %}
+        <button id="audio-start-button" type="submit" value="Start">Start</button>
+    </form>
+</body>
+{% endblock %}
+
+    {% block scripts %}
+    <script>
+        const startButton = document.getElementById('audio-start-button');
+const stopButton = document.getElementById('stop-button');
+const videoElement = document.getElementById('videoElement');
+let stream = null;
+
+startButton.addEventListener('click', async () => {
+    try {
+        // Get access to the camera
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        videoElement.srcObject = stream;
+        videoElement.play();
+        // Show video element
+        videoElement.style.display = 'block';
+    } catch (error) {
+        console.error('Error accessing the camera:', error);
+    }
+});
+
+stopButton.addEventListener('click', stopCamera);
+
+// Stop the camera when the page is being unloaded
+window.addEventListener('beforeunload', stopCamera);
+
+function stopCamera() {
+    // Stop the camera stream
+    if (stream) {
+        const tracks = stream.getTracks();
+        tracks.forEach(track => track.stop());
+        // Hide video element
+        videoElement.style.display = 'none';
+    }
+}
+
+        //video 
+
+        document.getElementById('audio-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+            document.getElementById('mygif1').style.display = 'block'; // Show the gif1 when recognizing
+            // Disable the buttons
+            document.querySelector('#audio-form button[type="submit"]').disabled = true;
+            document.getElementById('stop-button').disabled = true;
+            startRecognition();
+        });
+        
+        function startRecognition() {
+            console.log('clicked')
+            let recognition = new window.webkitSpeechRecognition();
+            recognition.lang = '{{ lang }}';
+            recognition.onresult = function (event) {
+                let text = event.results[0][0].transcript;
+                // Send 'text' to the server
+                fetch('/audio/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        'csrfmiddlewaretoken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'message': text
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('mygif1').style.display = 'none'; // Hide the gif1 when done recognizing
+                        // Handle the server's response
+                        let utterance = new SpeechSynthesisUtterance(data.response);
+                        utterance.lang = '{{ lang }}';
+                        utterance.onstart = function () {
+                            // Show the gif2 when speaking
+                            document.getElementById('mygif2').style.display = 'block';
+                        };
+                        utterance.onend = function () {
+                            // Hide the gif2 when done speaking
+                            document.getElementById('mygif2').style.display = 'none';
+                            // Enable the buttons
+                            document.querySelector('#audio-form button[type="submit"]').disabled = false;
+                            document.getElementById('stop-button').disabled = false;
+                        };
+                        window.speechSynthesis.speak(utterance);
+                    });
+            };
+            recognition.start();
+        }
+        
+        window.onbeforeunload = function () {
+            window.speechSynthesis.cancel();
+        };
+        
+        document.getElementById('stop-button').addEventListener('click', function () {
+            window.speechSynthesis.cancel();
+        });
+        
+    </script>
+    {% endblock scripts %}

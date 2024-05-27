@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!-- Popup -->
+<div id="popup">
+    <div class="container" id="recog">
+        <span class="circles lis1"></span>
+        <span class="circles lis2"></span>
+        <span class="circles lis3"></span>
+        <span class="circles lis4"></span>
+    </div>
+    <h2>Audio Chat</h2>
+    <!-- <i class="fa fa-microphone fa-2xl" aria-hidden="true"></i> -->
+    <div class="mic">
+        <img id="mic2" src="{% static 'images/mic.svg' %}" alt="Microphone">
+    </div>
+    <div class="pulse-ring"></div>
+    <div id="button-cont">
+        <form id="audio-form" method="post" onsubmit="showRecognizing()">
+            {% csrf_token %}
+            <button id="audio-start-button" type="submit" value="Start">Start</button>
+        </form>
+        <a id="stop-button" href="{% url 'chatbot' %}">Go back</a>
+    </div>
+    <div id="recognizing-message" style="display: none;">
+        <h1>speak now</h1>
+    </div>
+</div>
+<div id="voice-assistant" class="voice-assistant" style="display: none;">
+    <h2>Recognizing...</h2>
+</div>
+<div id="vocals" class="vocals" style="display: none;">
+    <h2>Responding...</h2>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('audio-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        document.getElementById('voice-assistant').style.display = 'block';
+        // Disable the buttons
+        document.querySelector('#audio-form button[type="submit"]').disabled = true;
+        document.getElementById('stop-button').disabled = true;
+        startRecognition();
+    });
+
+    function startRecognition() {
+        let recognition = new window.webkitSpeechRecognition();
+        recognition.lang = '{{ lang }}';
+        console.log("selected lang :" + recognition.lang)
+        recognition.onresult = function (event) {
+            let text = event.results[0][0].transcript;
+            fetch('/audio/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    'csrfmiddlewaretoken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'message': text
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('voice-assistant').style.display = 'none';
+                    // Handle the server's response
+                    let utterance = new SpeechSynthesisUtterance(data.response);
+                    utterance.lang = '{{ lang }}';
+                    console.log("speech lang :" + recognition.lang)
+                    utterance.onstart = function () {
+                        // Show the voice assistant animation
+                        document.getElementById('vocals').style.display = 'block';
+                    };
+                    utterance.onend = function () {
+                        // Hide the voice assistant animation
+                        document.getElementById('vocals').style.display = 'none';
+                        // Enable the buttons
+                        document.querySelector('#audio-form button[type="submit"]').disabled = false;
+                        document.getElementById('stop-button').disabled = false;
+                    };
+                    window.speechSynthesis.speak(utterance);
+                });
+        };
+        recognition.start();
+    }
+
+    window.onbeforeunload = function () {
+        window.speechSynthesis.cancel();
+    };
+
+    document.getElementById('stop-button').addEventListener('click', function () {
+        window.speechSynthesis.cancel();
+    });
+
+</script>
+{% endblock scripts %}

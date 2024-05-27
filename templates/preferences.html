@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Preferences{% endblock %}
+
+{% block styles %}
+<style>
+  body {
+      background-color: #f8f9fa;
+  }
+  
+  .container {
+    margin: 2rem auto;
+      width: 700px;
+      height: fit-content;
+      padding: 10px 15px;
+      border: 2px solid pink;
+  }
+  
+  #container-inside{
+      margin: 9px auto;
+      padding: 10px 10px ;
+  }
+  
+  h1 {
+      text-align: center;
+      margin-bottom: 30px;
+  }
+  
+  .option-container {
+      display: flex; 
+      flex-direction: column;
+      margin-bottom: 25px;
+  }
+  
+  .option-label {
+      font-weight: bold;
+      margin-bottom: 10px;
+  }
+  
+  .options {
+      display: flex;
+      justify-content: space-around; /* Change this line */
+  }
+  
+  .option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-right: 3rem;
+  }
+  
+  .option:last-child {
+      margin-right: 0;
+  }
+  
+  .icon {
+      width: 48px;
+      height: 48px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 2px solid transparent; /* Add this line */
+      border-radius: 20px; /* Add this line */
+  }
+  
+  /* Hide the radio button */
+  input[type="radio"] {
+      display: none;
+  }
+  
+  /* Zoom and add a box-shadow to the image when the radio button is selected */
+  input[type="radio"]:checked + label .icon {
+      transform: scale(1.1);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+      border-color: pink; /* Change this line */
+  }
+  
+  .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+      color: #fff;
+  }
+  
+  .btn-block {
+      display: block;
+      width: 100%;
+  }
+
+  input[type="number"]:focus {
+    border-color: pink;
+    box-shadow: 0 0 0 0.2rem rgba(255, 105, 180, 0.25); /* This line changes the box-shadow color to a semi-transparent pink */
+}
+
+#audio-start-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px; 
+    height: 50px; 
+    margin: 0 auto;
+}
+
+
+
+  </style>
+
+{% endblock %}
+
+{% block content %}
+<form action="{% url 'prefer' %}" method="post">
+    {% csrf_token %}
+    <div class="container">
+      <div id="container-inside">
+        <h1>Preferences</h1>
+        <div class="option-container">
+            <div class="option-label">Choose your language:</div>
+            <div class="options">
+      <div class="option">
+        <input type="radio" id="tamil" name="language" value="ta-IN" required>
+        <label for="tamil"><img class="icon" src="{% static 'images/tamil-5016148-4191327.png' %}" alt="Tamil icon"><br>Tamil</label>
+      </div>
+      <div class="option">
+        <input type="radio" id="english" name="language" value="en-IN" required>
+        <label for="english"><img class="icon" src="https://img.icons8.com/color/48/000000/great-britain-circular.png" alt="English icon"><br>English</label>
+      </div>
+      <div class="option">
+        <input type="radio" id="malayalam" name="language" value="ml-IN" required>
+        <label for="malayalam"><img class="icon" src="{% static 'images/malayalam1.png' %}" alt="Malayalam icon"><br>Malayalam</label>
+      </div>
+      <div class="option">
+        <input type="radio" id="telugu" name="language" value="te-IN" required>
+        <label for="telugu"><img class="icon" src="{% static 'images/telugu.png' %}" alt="Telugu icon"><br>Telugu</label>
+      </div>
+      <div class="option">
+        <input type="radio" id="hindi" name="language" value="hi-IN" required>
+        <label for="hindi"><img class="icon" src="{% static 'images/hindi-2693434-2235251.png' %}" alt="Hindi icon"><br>Hindi</label>
+      </div>
+    </div>
+            </div>
+
+        <!-- Other preference options -->
+        <div class="option-container">
+            <div class="option-label">Choose your favorite color:</div>
+            <input type="color" id="color" name="color" required>
+        </div>
+
+        <div class="option-container">
+            <div class="option-label">Choose your favorite season:</div>
+            <div class="options">
+              <div class="option">
+                <input type="radio" id="summer" name="season" value="summer" required>
+                <label for="summer"><img class="icon" src="https://img.icons8.com/color/48/000000/summer.png" alt="summer icon"><br>Summer</label>
+              </div>
+              <div class="option">
+                <input type="radio" id="winter" name="season" value="winter" required>
+                <label for="winter"><img class="icon" src="https://img.icons8.com/color/48/000000/winter.png" alt="winter icon"><br>Winter</label>
+              </div>
+              <div class="option">
+                <input type="radio" id="spring" name="season" value="spring" required>
+                <label for="spring"><img class="icon" src="https://img.icons8.com/color/48/000000/spring.png" alt="spring icon"><br>Spring</label>
+              </div>
+              <div class="option">
+                <input type="radio" id="rainy" name="season" value="rainy" required>
+                <label for="rainy"><img class="icon" src="https://img.icons8.com/color/48/000000/rain.png" alt="rainy icon"><br>Rainy</label>
+              </div>
+            </div>
+        </div>
+
+        <div class="option-container">
+            <div class="option-label">Choose your favorite pet:</div>
+            <div class="options">
+              <div class="option">
+                <input type="radio" id="dog" name="pet" value="dog" required>
+                <label for="dog"><img class="icon" src="https://img.icons8.com/color/48/000000/dog.png" alt="dog icon"><br>Dog</label>
+              </div>
+              <div class="option">
+                <input type="radio" id="cat" name="pet" value="cat" required>
+                <label for="cat"><img class="icon" src="https://img.icons8.com/color/48/000000/cat.png" alt="cat icon"><br>Cat</label>
+              </div>
+              <div class="option">
+                <input type="radio" id="rabbit" name="pet" value="rabbit" required> 
+                <label for="rabbit"><img class="icon" src="https://img.icons8.com/color/48/000000/rabbit.png" alt="rabbit icon"><br>Rabbit</label>
+              </div>
+              <div class="option">
+                <input type="radio" id="duck" name="pet" value="duck">
+                <label for="duck"><img class="icon" src="https://img.icons8.com/color/48/000000/duck.png" alt="duck icon"><br>Duck</label>
+              </div>
+              <div class="option">
+                <input type="radio" id="bird" name="pet" value="bird">
+                <label for="bird"><img class="icon" src="https://img.icons8.com/color/48/000000/bird.png" alt="bird icon"><br>Bird</label>
+              </div>
+              <div class="option">
+                <input type="radio" id="fish" name="pet" value="fish">
+                <label for="fish"><img class="icon" src="https://img.icons8.com/color/48/000000/fish.png" alt="fish icon"><br>Fish</label>
+              </div>
+              <div class="option">
+                <input type="radio" id="turtle" name="pet" value="turtle">
+                <label for="turtle"><img class="icon" src="https://img.icons8.com/color/48/000000/turtle.png" alt="turtle icon"><br>Turtle</label>
+              </div>
+            </div>
+        </div>
+
+        <div class="option-container">
+            <div class="option-label">Choose your gender:</div>
+            <div class="options">
+              <div class="option">
+                <input type="radio" id="male" name="gender" value="male">
+                <label for="male"><img class="icon" src="https://img.icons8.com/color/48/000000/male.png" alt="male icon"><br>Male</label>
+              </div>
+              <div class="option">
+                <input type="radio" id="female" name="gender" value="female">
+                <label for="female"><img class="icon" src="https://img.icons8.com/color/48/000000/female.png" alt="female icon"><br>Female</label>
+              </div>
+            </div>
+        </div>
+        <div class="option-container">
+          <div class="option-label">Select your age group:</div>
+          <div class="options">
+              <div class="option">
+                  <input type="radio" id="child" name="age" value="child" required>
+                  <label for="child"><img class="icon" src="{% static 'images/child.png' %}" alt="Child icon"><br>Child</label>
+              </div>
+              <div class="option">
+                  <input type="radio" id="teen" name="age" value="teen" required>
+                  <label for="teen"><img class="icon" src="{% static 'images/teen.png' %}" alt="Teen icon"><br>Teen</label>
+              </div>
+              <div class="option">
+                  <input type="radio" id="adult" name="age" value="adult" required>
+                  <label for="adult"><img class="icon" src="{% static 'images/adult.png' %}" alt="adult icon"><br>adult</label>
+              </div>
+              <div class="option">
+                  <input type="radio" id="old" name="age" value="old" required>
+                  <label for="old"><img class="icon" src="{% static 'images/old.png' %}" alt="old icon"><br>old</label>
+              </div>
+          </div>
+      </div>
+      
+      
+      
+        <button type="submit" id="audio-start-button">submit</button>
+      </div>
+    </div>
+    </div>
+</form>
+{% endblock %}
